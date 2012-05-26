@@ -4,7 +4,7 @@ Plugin Name: Custom Status
 Plugin URI: #
 Description: This plgin allow to manage custom statuses
 Version: 1.0
-Author: Carmine Ricco - Luca De Cristofano
+Author: Carmine Ricco, lucdecri
 Author URI: #
 License: GPL2
 */

@@ -1,5 +1,5 @@
 === Custom Status ===
-Contributors: Luca De Cristofano, Carmine Ricco
+Contributors: lucdecri, Carmine Ricco
 Tags: custom status, custom posttype, new status, status, publish action  
 Requires at least: 3.1
 Tested up to: 3.3.1
