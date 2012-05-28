@@ -4,7 +4,7 @@ Plugin Name: Custom Status
 Plugin URI: #
 Description: This plgin allow to manage custom statuses
 Version: 1.0
-Author: Carmine Ricco, lucdecri
+Author: lucdecri, carminericco
 Author URI: #
 License: GPL2
 */
@@ -143,7 +143,9 @@ define('CS_OPT_STATUSES','_extra_status');
 		$statuses = get_post_stati(null, 'objects' );		
 		
 		$editable_statuses_array = maybe_unserialize(get_option( CS_OPT_STATUSES, true ));
-		$editable_statuses = array(); 
+		if ($editable_statuses_array=='') $editable_statuses_array=array();
+		$editable_statuses = array();
+		
 		foreach($editable_statuses_array as $ed) {
 			$editable_statuses[$ed['slug']] = $ed['slug'];
 		}
@@ -151,10 +153,12 @@ define('CS_OPT_STATUSES','_extra_status');
 		$field = "";
 		$i = 1;
 		foreach($statuses as $status) {
+			
 			$opt_val = $status->label;
 			$slug_val = $status->name;
-			list($count_singular_val,$dummy) = split(' ',$status->label_count['singular'],2);
-			list($count_plural_val,$dummy) = split(' ',$status->label_count['plural'],2);
+			$label_count = $status->label_count;
+			list($count_singular_val,$dummy) = split(' ',$label_count['singular'],2);
+			list($count_plural_val,$dummy) = split(' ',$label_count['plural'],2);
 			$public_val = $status->public;	
 			if (in_array($status->name,$editable_statuses)) {
 				echo cs_print_custom_status($i, $opt_val, $slug_val, $count_singular_val, $count_plural_val, $public_val);		
@@ -184,10 +188,8 @@ define('CS_OPT_STATUSES','_extra_status');
 		};
 		
 		jQuery.post(ajaxurl, data, function(response) {
-
-			jQuery('#p_extra_status_'+response).css('background-color', '#FF8080');	    	
-			jQuery('#p_extra_status_'+response).fadeOut();			
-			
+			jQuery('#p_extra_status_'+parseInt(response)).css('background-color', '#FF8080')
+			jQuery('#p_extra_status_'+parseInt(response)).fadeOut();	
 		});
 	}
 	</script>
@@ -288,7 +290,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	    	}     	
 	    	
 	        update_option(CS_OPT_STATUSES, serialize($opt_val_array));	      
-		cs_my_custom_post_status();
+		cs_custom_post_status();
 	        
 			?>
 			<div class="updated">
@@ -620,8 +622,7 @@ define('CS_OPT_STATUSES','_extra_status');
 		$post_type = $post->post_type;
 		$post_type_object = get_post_type_object($post_type);
 		$can_publish = current_user_can($post_type_object->cap->publish_posts);		
-		
-		dbgx_trace_var($action);
+
 		if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) {
 			if ( $can_publish ) {
 				if ( !empty($post->post_date_gmt) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) {
