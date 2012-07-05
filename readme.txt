@@ -3,7 +3,7 @@ Contributors: lucdecri, carminericco
 Tags: custom status, custom posttype, new status, status, publish action  
 Requires at least: 3.1
 Tested up to: 3.3.1
-Stable tag: 0.1
+Stable tag: 1.1
 
 Add new statuses to post, page and custom-post.
 
