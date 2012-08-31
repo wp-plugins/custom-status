@@ -50,3 +50,28 @@ Fix some bug
 
 - A: Coded defined custom status are not modifiable from user interface. 
 
+- Q: I want publish post in a custom status. 
+
+- A: You can use save_post Hook. This function to do this, and define new flow for your posts.
+<PRE>
+function my_personal_flow($post_id) {
+  if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )   return;
+ 
+  // more security check …   
+
+  if (($_POST['original_post_status']=='draft') && ($_POST['post_status']=='publish') )
+	$new_post['post_status']='planned';
+ 
+  if (($_POST['original_post_status']=='planned') && ($_POST['post_status']=='publish') )
+	$new_post['post_status']='executed';
+
+  if (($_POST['original_post_status']=='executed') && ($_POST['post_status']=='publish') ) 	$new_post['post_status']='approved';
+
+  if (($_POST['original_post_status']=='approved') && ($_POST['post_status']=='publish') ) 	$new_post['post_status']='approved';
+	
+   remove_action( 'save_post', 'my_personal_flow' ); // to remove loop!! 
+   wp_update_post($new_post);
+   add_action( 'save_post', 'my_personal_flow' ); // to add filter for next save!!
+ }
+add_action('save_post','my_personal_flow');
+</PRE>
