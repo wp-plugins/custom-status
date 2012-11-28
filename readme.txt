@@ -3,7 +3,7 @@ Contributors: lucdecri, carminericco
 Tags: custom status, custom posttype, new status, status, publish action  
 Requires at least: 3.1
 Tested up to: 3.3.1
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2
 
 Add new statuses (created by user interface or from register_post_status() function) to post, page and custom-post.
@@ -36,7 +36,9 @@ Follow wordpress link.
 No status are lost. 
 
 == ChangeLog ==
-Readme.txt update.
+*1.2*
+- fix hook to labeling save button
+- fix hook to labeling publish button 
 
 Fix some bug
 
@@ -57,18 +59,14 @@ Fix some bug
 function my_personal_flow($post_id) {
   if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )   return;
  
-  // more security check …   
+  // more security check...   
 
   if (($_POST['original_post_status']=='draft') && ($_POST['post_status']=='publish') )
 	$new_post['post_status']='planned';
- 
   if (($_POST['original_post_status']=='planned') && ($_POST['post_status']=='publish') )
 	$new_post['post_status']='executed';
-
   if (($_POST['original_post_status']=='executed') && ($_POST['post_status']=='publish') ) 	$new_post['post_status']='approved';
-
   if (($_POST['original_post_status']=='approved') && ($_POST['post_status']=='publish') ) 	$new_post['post_status']='approved';
-	
    remove_action( 'save_post', 'my_personal_flow' ); // to remove loop!! 
    wp_update_post($new_post);
    add_action( 'save_post', 'my_personal_flow' ); // to add filter for next save!!

@@ -2,8 +2,8 @@
 /*
 Plugin Name: Custom Status
 Plugin URI: #
-Description: This plgin allow to manage custom statuses
-Version: 1.1
+Description: This plugin allow to manage custom statuses
+Version: 1.2
 Author: lucdecri, carminericco
 Author URI: #
 License: GPL2
@@ -58,6 +58,7 @@ define('CS_OPT_STATUSES','_extra_status');
 
 
 	add_action('admin_head', 'cs_add_custom_status_javascript');	
+	// aggiune un javascript per la pagina di creazione degli stati
 	function cs_add_custom_status_javascript() {
 	?>
 	<script type="text/javascript" >
@@ -82,12 +83,13 @@ define('CS_OPT_STATUSES','_extra_status');
 	
 	
 	add_action('wp_ajax_add_custom_status', 'cs_add_custom_status_callback');		
+        // necessario per gestire l'ajax quando creo gli stati
 	function cs_add_custom_status_callback() {		
 		echo cs_add_custom_status( $_POST[ 'i' ] );				
 		die();		
 	}
 	
-	
+	// aggiunge la riga dello stato $i
 	function cs_add_custom_status($i) {		
 		
 		$opt_val_array = maybe_unserialize(get_option( CS_OPT_STATUSES ));	
@@ -102,7 +104,7 @@ define('CS_OPT_STATUSES','_extra_status');
 		
 	}
 	
-	
+	// visualizza la riga per editare gli stati
 	function cs_print_custom_status($i, $opt_val, $slug_val, $count_singular_val, $count_plural_val, $public_val){
 		
 		global $data_field_name;
@@ -136,7 +138,7 @@ define('CS_OPT_STATUSES','_extra_status');
 		
 	}
 	
-	
+	// visualizza la riga per gli stati non modificabili (creati da codice o da plugin)
 	function cs_print_statuses() {			
 		
 		$label_default = __("Default Status", CS_DOMAIN );	
@@ -175,6 +177,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	
 	
 	add_action('admin_head', 'cs_del_custom_status_javascript');	
+	// aggiunge un javascript per eliminare la riga dello stato
 	function cs_del_custom_status_javascript() {
 	?>
 	<script type="text/javascript" >
@@ -198,6 +201,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	
 	
 	add_action('wp_ajax_del_custom_status', 'cs_del_custom_status_callback');		
+	// elimina uno stato in base alla chiamata ajax
 	function cs_del_custom_status_callback() {				
 
 		
@@ -217,12 +221,11 @@ define('CS_OPT_STATUSES','_extra_status');
 		
 	 // add the admin options page
 	add_action('admin_menu', 'cs_plugin_custom_statuses_add_page');		
+	//Aggiunge la pagina per modificaare gli stati
 	function cs_plugin_custom_statuses_add_page() {
 		add_options_page('Custom Statuses Page', 'Custom Statuses', 'manage_options', 'custom_statuses_page', 'cs_settings_page');
 	}	
-	
-		
-		
+	// la pagina di modifica degli stati	
 	function cs_settings_page() {
 		
 		global $hidden_field_name;
@@ -347,6 +350,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	
 	
 	add_action( 'init', 'cs_custom_post_status' );
+        // registra gli stati salvati nelle options
 	function cs_custom_post_status(){
 		
 
@@ -369,6 +373,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	}
 		
 	add_action( 'current_screen', 'cs_add_meta_boxes');
+        // elimina il box classico per pubblicare e lo costituisce con quello custom
 	function cs_add_meta_boxes($screen) {
 		if ($screen->base == 'post' && $screen->post_type != '' ) {
 			remove_meta_box('submitdiv', $screen->post_type, 'normal');
@@ -380,7 +385,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	
 
 	
-	// sostituisce submitdiv (il form per fare il submit di un post)
+	// sostituisce submitdiv (il form per fare il submit di un post) con un nuovo che permette di gestire i customstatus
 	function cs_custom_post_submit_box($post) {
 		global $action;
 	
@@ -403,7 +408,12 @@ define('CS_OPT_STATUSES','_extra_status');
 		<div id="minor-publishing-actions">
 		<div id="save-action">
 		<?php
-			$save_action = apply_filters($post_type.'_save_action',array('label' => 'Save Draft'));
+			// questo deve essere usato per salvare con lo stato attuale
+                        //@FIXME qualche volta riporta in stato bozza. Perchè?
+                        $save_action = array('label' => 'Save Draft');
+                        $save_action = apply_filters('save_action',$save_action);
+                        $save_action = apply_filters($post_type.'_save_action',$save_action);
+                        
 		 	if ($save_action['label']!='') {
 				echo '<input type="submit" name="save" id="save-post" value="'. esc_attr__($save_action['label']) . '" tabindex="4" class="button button-highlighted" />';
 			}
@@ -589,7 +599,9 @@ define('CS_OPT_STATUSES','_extra_status');
 		<img src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" class="ajax-loading" id="ajax-loading" alt="" />
 		<?php
 		// @TODO qui va verificato se funziona sempre
-			$next_action = apply_filters($post_type.'_publish_action',array('label' => 'Publish', 'action' => 'publish'));
+                        $next_action = array('label' => 'Publish', 'action' => 'publish');
+                        $next_action = apply_filters('publish_action', $next_action);
+			$next_action = apply_filters($post_type.'_publish_action', $next_action);
 		 	echo '<input name="original_publish" type="hidden" id="original_publish" value="'. esc_attr__($next_action['label']) .'" />';
 			submit_button( __( $next_action['label'] ), 'primary', $next_action['action'], false, array( 'tabindex' => '5', 'accesskey' => 'p' ) ); 
 		?>
@@ -616,6 +628,7 @@ define('CS_OPT_STATUSES','_extra_status');
 	}
 		
 	add_filter('post_publish_action','cs_post_publish_action');
+        // Indica che azione e label deve avere il pulsante "publish" (major_publish)
 	function cs_post_publish_action($action) {
 	global $post;
 
@@ -646,7 +659,8 @@ define('CS_OPT_STATUSES','_extra_status');
 	}
 	
 	
-	add_filter('post_aviable_statuses','cs_post_filter_status');
+	add_filter('post_available_statuses','cs_post_filter_status');
+        // ripristina i soli stati standard per il post? da verificare se serve
 	function cs_post_filter_status($statuses) {
 	global $post;
 	
@@ -655,7 +669,8 @@ define('CS_OPT_STATUSES','_extra_status');
 
 	}
 	
-	add_filter('page_aviable_statuses','cs_page_filter_status');
+	add_filter('page_available_statuses','cs_page_filter_status');
+	// ripristina i soli stati standard per la pagina? da verificare se serve
 	function cs_page_filter_status($statuses) {
 	global $post;
 		
