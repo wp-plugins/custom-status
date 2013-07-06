@@ -2,8 +2,8 @@
 Contributors: lucdecri, carminericco
 Tags: custom status, custom posttype, new status, status, publish action  
 Requires at least: 3.1
-Tested up to: 3.3.1
-Stable tag: 1.2
+Tested up to: 3.5.1
+Stable tag: 1.3
 License: GPLv2
 
 Add new statuses (created by user interface or from register_post_status() function) to post, page and custom-post.
@@ -36,6 +36,10 @@ Follow wordpress link.
 No status are lost. 
 
 == ChangeLog ==
+*1.3*
+- some bug fix
+- fix using Event+
+
 *1.2*
 - fix hook to labeling save button
 - fix hook to labeling publish button 
@@ -45,7 +49,7 @@ Fix some bug
 == Frequently Asked Questions ==
 - Q: When click "publish" button, my custom status is lost.
 
-- A: You use "save" button to save post preserving custom status
+- A: You use "save" button to save post preserving custom status. Else use save_post hook to set correct status when publish
 
 
 - Q: Some custom status are not modifiable. Why?

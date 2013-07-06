@@ -3,7 +3,7 @@
 Plugin Name: Custom Status
 Plugin URI: #
 Description: This plugin allow to manage custom statuses
-Version: 1.2
+Version: 1.3
 Author: lucdecri, carminericco
 Author URI: #
 License: GPL2
@@ -145,7 +145,7 @@ define('CS_OPT_STATUSES','_extra_status');
 		$statuses = get_post_stati(null, 'objects' );		
 		
 		$editable_statuses_array = maybe_unserialize(get_option( CS_OPT_STATUSES, true ));
-		if ($editable_statuses_array=='') $editable_statuses_array=array();
+		if ($editable_statuses_array=='' || !is_array($editable_statuses_array)) $editable_statuses_array=array();
 		$editable_statuses = array();
 		
 		foreach($editable_statuses_array as $ed) {
@@ -159,15 +159,17 @@ define('CS_OPT_STATUSES','_extra_status');
 			$opt_val = $status->label;
 			$slug_val = $status->name;
 			$label_count = $status->label_count;
-			list($count_singular_val,$dummy) = split(' ',$label_count['singular'],2);
-			list($count_plural_val,$dummy) = split(' ',$label_count['plural'],2);
-			$public_val = $status->public;	
-			if (in_array($status->name,$editable_statuses)) {
-				echo cs_print_custom_status($i, $opt_val, $slug_val, $count_singular_val, $count_plural_val, $public_val);		
-				$i++;			
-			} else {
-				if (('inherit'!=$status->name) && ('auto-draft'!=$status->name)) 
-				$field .= '<p>' . $label_default . ' <input type="text" readonly="readonly" id="fixed_status_'.$slug_val .'" name="fixed_status_'.$slug_val . '" value="' . $status->label . '" size="20"></p>';
+			if (isset($label_count['singular']) && isset($label_count['plural'])) {
+				list($count_singular_val,$dummy) = split(' ',$label_count['singular'],2);
+				list($count_plural_val,$dummy) = split(' ',$label_count['plural'],2);
+				$public_val = $status->public;	
+				if (in_array($status->name,$editable_statuses)) {
+					echo cs_print_custom_status($i, $opt_val, $slug_val, $count_singular_val, $count_plural_val, $public_val);		
+					$i++;			
+				} else {
+					if (('inherit'!=$status->name) && ('auto-draft'!=$status->name)) 
+					$field .= '<p>' . $label_default . ' <input type="text" readonly="readonly" id="fixed_status_'.$slug_val .'" name="fixed_status_'.$slug_val . '" value="' . $status->label . '" size="20"></p>';
+				}
 			}
 				
 		}
@@ -482,7 +484,7 @@ define('CS_OPT_STATUSES','_extra_status');
 			$statuses = get_post_stati(null, 'object');
 			$statuses = apply_filters($post_type.'_available_statuses',$statuses);
 			foreach($statuses as $status) {	
-				if ($status->name != "auto-draft" && $status->name != "inherit" ) {		
+				if ($status->name != "auto-draft" && $status->name != "inherit" && $status->name != "recurrent") {		
 				?>
 				<option<?php selected( $post_status, $status->name ); ?> value='<?php echo $status->name ?>'><?php echo __($status->label, CS_DOMAIN ) ?></option>
 				<?php
