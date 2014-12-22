@@ -4,12 +4,12 @@ Plugin Name: Custom Status
 Plugin URI: #
 Description: This plugin allow to manage custom statuses
 Version: 1.3
-Author: lucdecri, carminericco
+Author: carminericco
 Author URI: #
 License: GPL2
 */
 	
-	
+
 define('CS_DOMAIN','custom_status');
 define('CS_OPT_STATUSES','_extra_status');
 
