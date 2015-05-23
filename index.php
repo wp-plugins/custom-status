@@ -4,8 +4,8 @@ Plugin Name: Custom Status
 Plugin URI: #
 Description: This plugin allow to manage custom statuses
 Version: 1.3
-Author: carminericco
-Author URI: #
+Author: Carmine Ricco
+Author URI: http://www.syriusweb.com
 License: GPL2
 */
 	
